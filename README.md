@@ -6,7 +6,7 @@ This project implements a decision framework for autonomous robots to navigate s
 
 ## Requirements
 
-- Python 3.x
+- Python 3.8+
 - Required Python packages (install using `pip install -r requirements.txt` ):
 
 ## File Structure
