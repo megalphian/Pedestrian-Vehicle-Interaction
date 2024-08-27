@@ -22,5 +22,10 @@ PEDESTRIAN_PATH8 = [(0, 5), (1, 5), (2, 5), (3, 5), (4, 5), (5, 5), (5, 5), (5, 
 PEDESTRIAN_PATH9 = [(2, 0), (3, 1), (4, 2), (5, 3), (5, 4), (5, 5), (4, 6), (3, 7), (2, 8), (1, 9)]
 PEDESTRIAN_PATH10 = [(5, 0), (4, 1), (3, 2), (2, 3), (1, 4), (0, 5), (1, 6), (2, 7), (3, 8), (4, 9)]
 
+PEDESTRIAN_PATH11 = [(5,5),(4,5),(3,5),(2,5),(1,5),(0,5)]
+
+PED_PATH_REV = PEDESTRIAN_PATH11.copy()
+PED_PATH_REV.reverse()
+
 # set path for simulation
-PEDESTRIAN_PATH = PEDESTRIAN_PATH3
+PEDESTRIAN_PATH = (PEDESTRIAN_PATH11 + PED_PATH_REV) * 5

@@ -63,46 +63,48 @@ def time_to_interaction(robot_pos, pedestrian_pos, speed):
 stagnant_steps = 0
 
 # Simulation loop
-i = 0
-for step in range(num_steps):
-    if step >= 2:  # Start predictions after initial steps
-        if step < 10:
-            previous_positions = pedestrian_route[:step+1]  # Use however many accumulated positions
+robot_step = 0
+for sim_step in range(num_steps):
+    if sim_step >= 2:  # Start predictions after initial steps
+        if sim_step < 10:
+            previous_positions = pedestrian_route[:sim_step+1]  # Use however many accumulated positions
         else:
-            previous_positions = pedestrian_route[step-9:step+1]  # Use the last 10 positions
+            previous_positions = pedestrian_route[sim_step-9:sim_step+1]  # Use the last 10 positions
 
-        if step == 2 or step % 10 == 0:  # Initial prediction and every 10 steps
-            future_positions = predictor.predict_next_positions(previous_positions, beta)
-        else:
-            future_positions = predictor.predict_next_positions(previous_positions, 1) + future_positions[1:]
+        # if step == 2 or step % 10 == 0:  # Initial prediction and every 10 steps
+        #     future_positions = predictor.predict_next_positions(previous_positions, beta)
+        # else:
+        #     future_positions = predictor.predict_next_positions(previous_positions, 1) + future_positions[1:]
+
+        future_positions = predictor.predict_next_positions(previous_positions, beta)
 
         predicted_positions.append(future_positions)
     else:
-        predicted_positions.append([pedestrian_route[step]])
+        predicted_positions.append([pedestrian_route[sim_step]])
 
     # Check if the pedestrian is stagnant (i.e., hasn't moved)
-    if step > 0 and coordinates_match(pedestrian_route[step], pedestrian_route[step - 1]):
+    if sim_step > 0 and coordinates_match(pedestrian_route[sim_step], pedestrian_route[sim_step - 1]):
         stagnant_steps += 1
     else:
         stagnant_steps = 0  # Reset if the pedestrian moves
 
     # Continuous Monitoring and Safety Check: Ensure the robot never occupies the same position as the pedestrian
-    if coordinates_match(robot_route[step], pedestrian_route[step]):
-        print(f"Stop at step {step}: Robot and pedestrian would collide at {robot_route[step]}")
-        robot_positions.append(robot_route[i-1])  # Stop the robot (stay in place)
+    if coordinates_match(robot_route[robot_step], pedestrian_route[sim_step]):
+        print(f"Stop at step {sim_step}: Robot and pedestrian would collide at {robot_route[sim_step]}")
+        robot_positions.append(robot_positions[-1])  # Stop the robot (stay in place)
     else:
-        interaction_time = time_to_interaction(robot_route[step], pedestrian_route[step], speed)
+        interaction_time = time_to_interaction(robot_route[sim_step], pedestrian_route[sim_step], speed)
 
         # Interaction Time Analysis: Check if a replan is needed
         if interaction_time > alpha or stagnant_steps > tau:
-            print(f"Replan at step {step}: Pedestrian at {pedestrian_route[step]} (stagnant for {stagnant_steps} steps)")
+            print(f"Replan at step {sim_step}: Pedestrian at {pedestrian_route[sim_step]} (stagnant for {stagnant_steps} steps)")
             # Start replan procedure
-            robot_positions.append(robot_route[i])  # Append current position before replanning
+            robot_positions.append(robot_route[robot_step])  # Append current position before replanning
             break  # Add logic for replanning here
         else:
-            robot_positions.append(robot_route[i])  # Continue to the next position
+            robot_positions.append(robot_route[robot_step])  # Continue to the next position
 
-    i += 1
+        robot_step += 1
 print("ped_route: ", pedestrian_route)
 print("Robot_positions: ", robot_positions)
 

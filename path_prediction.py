@@ -11,8 +11,16 @@ class PedestrianPrediction:
         current_position = np.array(previous_positions[-1])
         previous_position = np.array(previous_positions[-2])
         velocity = current_position - previous_position
+
+        # If zero velocity, return the current position for the next num_steps_ahead steps
+        if velocity.all() == 0:
+            return [tuple(current_position)] * num_steps_ahead
+        
         desired_direction = velocity / np.linalg.norm(np.array(velocity))
+        
+        # MR: I am not sure about the following line
         acceleration = desired_direction - velocity
+        
         predicted_positions = []
         for step in range(1, num_steps_ahead + 1):
             next_position = current_position + velocity * step + 0.5 * acceleration * (step) ** 2
